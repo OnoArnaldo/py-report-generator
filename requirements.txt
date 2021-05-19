@@ -1,0 +1,16 @@
+attrs==21.2.0
+chardet==4.0.0
+iniconfig==1.1.1
+Jinja2==3.0.0
+MarkupSafe==2.0.0
+packaging==20.9
+Pillow==8.2.0
+pluggy==0.13.1
+py==1.10.0
+pyparsing==2.4.7
+pypugjs==5.9.9
+pytest==6.2.4
+reportlab==3.5.67
+six==1.16.0
+toml==0.10.2
+xmljson==0.2.1

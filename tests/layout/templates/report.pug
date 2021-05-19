@@ -1,0 +1,31 @@
+report#rpt001(page-size="A4" unit="cm" font="Courier 10 left")
+    page#page001(margin="1")
+        row#header001(height="3")
+            column(width="16" border="1")
+                row(height="1.2" margin="0.3 0 0.25 0")
+                    text(font="Courier 7 left" margin="0.1") Company:
+                    text(margin="0.2 1 0.2 0.2")= data.document.company.name['$']
+                row(height="1.2" margin="0.25 0 0 0")
+                    text(font="Courier 7 left" margin="0.1") Address:
+                    text(margin="0.2 1 0.2 0.2")= data.document.company.address['$']
+            column(border="1")
+                image#logo001= asset('150.png')
+
+        row#blank(height="0.5")
+
+        row#item-header(height="0.5")
+            column(width="10" border="1")
+                text(font="Courier 10 left" margin="0.3") Description
+            column(width="5" border="1")
+                text(font="Courier 10 left" margin="0.3") Qty
+            column(border="1")
+                text(font="Courier 10 right" margin="0.3") Price
+
+        each idx, item in enumerate(data.document['item'])
+            row(id="item-detail-#{idx}" height="0.6")
+                column(width="10" border="1")
+                    text(margin="0.3") #{item['@id']}: #{item.name['$']}
+                column(width="5" border="1")
+                    text(margin="0.3")= item.qty['$']
+                column(border="1")
+                    text(font="Courier 10 right" margin="0.3")= item.price['$']
