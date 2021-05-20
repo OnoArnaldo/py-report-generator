@@ -12,9 +12,9 @@ class Parser:
         env = pug.build_environment(template_dir=self.template_dir, asset_dir=self.asset_dir)
         self.render = pug.build_renderer(env)
 
-    def __call__(self, template, data):
+    def __call__(self, template, data, **renderer_args):
         data = xml.from_file(os.path.join(self.data_dir, data))
-        report_xml = self.render(template, data=data)
+        report_xml = self.render(template, data=data, **renderer_args)
         report_dict = xml.from_string(report_xml, 'abdera')
 
         k, v = report_dict.popitem()
