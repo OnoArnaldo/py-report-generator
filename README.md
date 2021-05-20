@@ -11,6 +11,12 @@ pip install --upgrade pip
 pip install git+https://github.com/OnoArnaldo/py-report-generator.git
 ```
 
+In case this project is still private, use the command below:
+
+```shell
+pip install git+ssh://git@github.com/OnoArnaldo/py-report-generator.git
+```
+
 # Usage
 
 ## Templates
