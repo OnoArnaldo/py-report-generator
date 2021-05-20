@@ -25,7 +25,7 @@ def _get_namespace(data, path, ns=None):
         elif (value := result.get(ns_tag)) is not None:
             result = value
 
-    return result.get('$', '')
+    return result.get('$', result)
 
 
 def build_environment(*, template_dir, asset_dir):
