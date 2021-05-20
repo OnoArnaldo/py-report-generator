@@ -191,7 +191,7 @@ class Text(ReportElement):
 
     @cached_property
     def calculated_top(self) -> float:
-        return self.parent.position.top + self._margin.top
+        return self.parent.position.top + self._margin.top + self.calculated_font_size
 
     @cached_property
     def calculated_left(self) -> float:

@@ -1,0 +1,58 @@
+<nfeProc versao="4.00"
+         xmlns:nfe="http://www.portalfiscal.inf.br/nfe"
+         xmlns:nfe2="http://www.portalfiscal.inf.br/nfe2">
+
+    <nfe:NFe>
+        <infNFe Id="NFe0001" versao="4.00">
+            <ide>
+                <cUF>35</cUF>
+                <cNF>45307160</cNF>
+                <natOp>Venda</natOp>
+                <mod>55</mod>
+                <serie>1</serie>
+                <nNF>979</nNF>
+                <dhEmi>2019-07-25T11:25:00-03:00</dhEmi>
+                <dhSaiEnt>2019-07-25T11:25:00-03:00</dhSaiEnt>
+                <tpNF>1</tpNF>
+                <idDest>1</idDest>
+                <cMunFG>3550308</cMunFG>
+                <tpImp>1</tpImp>
+                <tpEmis>1</tpEmis>
+                <cDV>4</cDV>
+                <tpAmb>1</tpAmb>
+                <finNFe>1</finNFe>
+                <indFinal>0</indFinal>
+                <indPres>9</indPres>
+                <procEmi>0</procEmi>
+                <verProc>0</verProc>
+            </ide>
+        </infNFe>
+    </nfe:NFe>
+
+    <nfe2:NFe>
+        <infNFe Id="NFe0001" versao="4.00">
+            <ide>
+                <cUF>36</cUF>
+                <cNF>45307161</cNF>
+                <natOp>Venda2</natOp>
+                <mod>56</mod>
+                <serie>2</serie>
+                <nNF>978</nNF>
+                <dhEmi>2019-07-26T11:25:00-03:00</dhEmi>
+                <dhSaiEnt>2019-07-26T11:25:00-03:00</dhSaiEnt>
+                <tpNF>2</tpNF>
+                <idDest>2</idDest>
+                <cMunFG>3550309</cMunFG>
+                <tpImp>2</tpImp>
+                <tpEmis>2</tpEmis>
+                <cDV>5</cDV>
+                <tpAmb>2</tpAmb>
+                <finNFe>2</finNFe>
+                <indFinal>1</indFinal>
+                <indPres>10</indPres>
+                <procEmi>1</procEmi>
+                <verProc>1</verProc>
+            </ide>
+        </infNFe>
+    </nfe2:NFe>
+</nfeProc>
