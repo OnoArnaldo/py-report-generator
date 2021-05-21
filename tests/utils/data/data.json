@@ -1,0 +1,111 @@
+{
+  "document": {
+    "children": [
+      {
+        "company": {
+          "children": [
+            {
+              "name": {
+                "attributes": {
+                  "id": "Comp0001",
+                  "alias": "Company A"
+                },
+                "children": [
+                  "The Company"
+                ]
+              }
+            },
+            {
+              "address": "The Address"
+            },
+            {
+              "email": "test@email.com"
+            },
+            {
+              "phone": "1234.5678"
+            }
+          ]
+        }
+      },
+      {
+        "customer": {
+          "children": [
+            {
+              "name": {
+                "attributes": {
+                  "id": "Cust0001"
+                },
+                "children": [
+                  "The Customer"
+                ]
+              }
+            },
+            {
+              "address": "The Cust. Address"
+            },
+            {
+              "email": "cust@email.com"
+            },
+            {
+              "phone": "9876.1234"
+            }
+          ]
+        }
+      },
+      {
+        "item": {
+          "attributes": {
+            "id": "i001"
+          },
+          "children": [
+            {
+              "name": "Item001"
+            },
+            {
+              "qty": "10"
+            },
+            {
+              "price": "1000"
+            }
+          ]
+        }
+      },
+      {
+        "item": {
+          "attributes": {
+            "id": "i002"
+          },
+          "children": [
+            {
+              "name": "Item002"
+            },
+            {
+              "qty": "20"
+            },
+            {
+              "price": "2000"
+            }
+          ]
+        }
+      },
+      {
+        "item": {
+          "attributes": {
+            "id": "i003"
+          },
+          "children": [
+            {
+              "name": "Item003"
+            },
+            {
+              "qty": "30"
+            },
+            {
+              "price": "3000"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

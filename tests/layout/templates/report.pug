@@ -21,11 +21,11 @@ report#rpt001(page-size="A4" unit="cm" font="Courier 10 left")
             column(border="1")
                 text(font="Courier 10 right" margin="0.06") Price
 
-        each idx, item in enumerate(data.document['item'])
-            row(id="item-detail-#{idx}" height="0.6")
-                column(width="10" border="1")
-                    text(margin="0.06") #{item['@id']}: #{item.name['$']}
-                column(width="5" border="1")
-                    text(margin="0.06")= item.qty['$']
-                column(border="1")
-                    text(font="Courier 10 right" margin="0.06")= item.price['$']
+         each idx, item in enumerate(data.document.item['*'])
+             row(id="item-detail-#{idx}" height="0.6")
+                 column(width="10" border="1")
+                     text(margin="0.06") #{item['@id']}: #{item.name['$']}
+                 column(width="5" border="1")
+                     text(margin="0.06")= item.qty['$']
+                 column(border="1")
+                     text(font="Courier 10 right" margin="0.06")= item.price['$']

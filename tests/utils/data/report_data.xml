@@ -1,0 +1,29 @@
+<document>
+    <company>
+        <name id="Comp0001" alias="Company A">The Company</name>
+        <address>The Address</address>
+        <email>test@email.com</email>
+        <phone>1234.5678</phone>
+    </company>
+    <customer>
+        <name id="Cust0001">The Customer</name>
+        <address>The Cust. Address</address>
+        <email>cust@email.com</email>
+        <phone>9876.1234</phone>
+    </customer>
+    <item id="i001">
+        <name>Item001</name>
+        <qty>10</qty>
+        <price>1000</price>
+    </item>
+    <item id="i002">
+        <name>Item002</name>
+        <qty>20</qty>
+        <price>2000</price>
+    </item>
+    <item id="i003">
+        <name>Item003</name>
+        <qty>30</qty>
+        <price>3000</price>
+    </item>
+</document>

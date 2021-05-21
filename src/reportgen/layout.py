@@ -13,7 +13,9 @@ class Parser:
         self.render = pug.build_renderer(env)
 
     def __call__(self, template, data, **renderer_args):
-        data = xml.from_file(os.path.join(self.data_dir, data))
+        data = xml.from_file(os.path.join(self.data_dir, data), 'abdera')
+        data = pug.build_data(data)
+
         report_xml = self.render(template, data=data, **renderer_args)
         report_dict = xml.from_string(report_xml, 'abdera')
 

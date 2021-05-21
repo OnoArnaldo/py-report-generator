@@ -15,11 +15,11 @@ class InvalidEngine(Exception):
 
 def from_string(text: str, engine: str = 'badgerfish') -> OrderedDict:
     if (eng := engines.get(engine)) is not None:
-        return eng().data(_ET.fromstring(text))
+        return eng(xml_fromstring=False).data(_ET.fromstring(text))
     raise InvalidEngine(engine)
 
 
 def from_file(fname: str, engine: str = 'badgerfish') -> OrderedDict:
     if (eng := engines.get(engine)) is not None:
-        return eng().data(_ET.parse(fname).getroot())
+        return eng(xml_fromstring=False).data(_ET.parse(fname).getroot())
     raise InvalidEngine(engine)
