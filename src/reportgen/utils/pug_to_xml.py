@@ -1,4 +1,3 @@
-# import json
 import os
 from typing import Dict, List
 from jinja2 import Environment, FileSystemLoader
@@ -62,8 +61,8 @@ class Data:
             elif isinstance(data, str):
                 return ''
             return data.get('attributes', {}).get(att_name, '')
-        elif item == '*' and isinstance(data, list):
-            return [Data(d) for d in data]
+        elif item == '*':
+            return [Data(d) for d in data] if isinstance(data, list) else []
 
 
 class DataWithNS(Data):

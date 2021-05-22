@@ -29,6 +29,13 @@ def test_data_list():
     assert items[0]['@id'] == 'ID0001'
 
 
+def test_data_list_not_existing():
+    data = pug.build_data('')
+
+    items = data['*']
+    assert len(items) == 0
+
+
 def test_data_value_chain():
     data = pug.build_data({
         "company": {
