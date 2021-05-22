@@ -83,7 +83,7 @@ class DataWithNS(Data):
     def __getitem__(self, item):
         ret = super(DataWithNS, self).__getitem__(item)
         if isinstance(ret, list):
-            return [DataWithNS(i.data) for i in ret]
+            return [DataWithNS(i.data, self.ns) for i in ret]
         return ret
 
 
