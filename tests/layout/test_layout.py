@@ -229,7 +229,7 @@ def test_layout(canvas):
     ]
 
 
-def _test_layout_with_namespace(canvas):
+def test_layout_with_namespace(canvas):
     parse = Parser(TEMPLATE, DATA, ASSET)
     report = parse('report_with_namespace', 'report_with_namespace.xml')
     report.process(canvas)

@@ -1,8 +1,4 @@
-from os.path import abspath, dirname, join
 from reportgen.utils import pug_to_xml as pug
-
-ROOT = abspath(dirname(__file__))
-DATA = join(ROOT, 'data')
 
 
 def test_data_is_string():
@@ -53,6 +49,10 @@ def test_data_value_chain():
     assert data.company.address['$'] == 'The Address'
     assert data.company.name['$'] == 'The Company'
     assert data.company.name['@id'] == 'Comp0001'
+    assert data.notExists['$'] == ''
+    assert data.notExists['@id'] == ''
+    assert data.notExists.nothing['$'] == ''
+    assert data.notExists.nothing['@id'] == ''
 
 
 def test_data_chain_with_list():

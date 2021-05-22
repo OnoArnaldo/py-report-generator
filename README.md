@@ -28,11 +28,11 @@ Example:
 report#report-name(page-size="A4" unit="cm" font="Courier 10 left")
   page(margin="1")
     row(height="2" border="1")
-      text= data.invoice.company.name
+      text= data.invoice.company.name['$']
     row#spacer(height="0.5")
-    each line in data.invoice.item
+    each line in data.invoice.item['*']
       row(height="2" border="1")
-        text #{line.name} - #{line.qty} - #{line.price}
+        text #{line.name['$']} - #{line.qty['$']} - #{line.price['$']}
 ```
 
 The template can have the following structure:
@@ -51,6 +51,9 @@ report#report-id(page-size unit font)
 > `Report` can have multiple pages, and only `pages`
 > 
 > `Page`, `row` and `column` can have multiples `row`, `column`, `text` and `image`
+
+> For more complex example, please go to the end of this document 
+
 
 ## XML data
 
@@ -98,3 +101,37 @@ report.process(canvas)
 
 canvas.save()
 ```
+
+# Complex example
+
+The reportgen will send the xml data to the template using the variable `data`.
+
+You can chain the tags separated by `.` to reach specific value.
+It has to finish with `['$']` to retrieve the value inside the tag.
+
+example:
+```jade
+report
+    page
+        text= data.root.field['$']
+```
+
+To retrieve an attribute value, use `['@AttributeName']`.
+
+example:
+```jade
+report
+    page
+        text= data.root.field['@id']
+```
+
+And to iterate through multiple elements, use `['*']`.
+
+example:
+```jade
+report
+    page
+        each item in data.root.item['*']
+            text= item.name['$']
+```
+

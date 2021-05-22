@@ -1,10 +1,11 @@
 - var ns = {"nfe": "http://www.portalfiscal.inf.br/nfe", "nfe2": "http://www.portalfiscal.inf.br/nfe2"}
+- var data = dataNS(data, ns)
 
 report(page-size="a4" unit="cm" font="Courier 10 left")
     page(margin="1")
         row(height="5" font="Courier 15 center" border="1")
-            text NatOp 1: #{getNS(data, 'nfeProc/nfe:NFe/infNFe/ide/natOp', ns)}
-            text NatOp 2: #{getNS(data, 'nfeProc/nfe2:NFe/infNFe/ide/natOp', ns)}
+            text NatOp 1: #{data.nfeProc.nfe__NFe.infNFe.ide.natOp['$']}
+            text NatOp 2: #{data.nfeProc.nfe2__NFe.infNFe.ide.natOp['$']}
         row(font="Courier 20 left" border="1" margin="1")
-            text verProc 1: #{getNS(data, 'nfeProc/nfe:NFe/infNFe/ide/cMunFG', ns)}
-            text verProc 2: #{getNS(data, 'nfeProc/nfe2:NFe/infNFe/ide/cMunFG', ns)}
+            text verProc 1: #{data.nfeProc.nfe__NFe.infNFe.ide.cMunFG['$']}
+            text verProc 2: #{data.nfeProc.nfe2__NFe.infNFe.ide.cMunFG['$']}

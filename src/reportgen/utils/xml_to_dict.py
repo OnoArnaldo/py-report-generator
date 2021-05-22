@@ -13,13 +13,13 @@ class InvalidEngine(Exception):
         super(InvalidEngine, self).__init__(f'Invalid engine {engine}')
 
 
-def from_string(text: str, engine: str = 'badgerfish') -> OrderedDict:
+def from_string(text: str, engine: str = 'abdera') -> OrderedDict:
     if (eng := engines.get(engine)) is not None:
         return eng(xml_fromstring=False).data(_ET.fromstring(text))
     raise InvalidEngine(engine)
 
 
-def from_file(fname: str, engine: str = 'badgerfish') -> OrderedDict:
+def from_file(fname: str, engine: str = 'abdera') -> OrderedDict:
     if (eng := engines.get(engine)) is not None:
         return eng(xml_fromstring=False).data(_ET.parse(fname).getroot())
     raise InvalidEngine(engine)

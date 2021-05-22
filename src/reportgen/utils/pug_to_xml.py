@@ -1,4 +1,4 @@
-import json
+# import json
 import os
 from typing import Dict, List
 from jinja2 import Environment, FileSystemLoader
@@ -11,23 +11,8 @@ def _get_asset(fname):
     return os.path.join(asset_folder, fname)
 
 
-def __ns(tag, ns):
-    if isinstance(ns, dict) and ':' in tag:
-        tag_ns, tag_name = tag.split(':')
-        return '{' + ns.get(tag_ns, '') + '}' + tag_name
-    return tag
-
-
-def _get_namespace(data, path, ns=None):
-    result = data
-    for tag in path.split('/'):
-        ns_tag = __ns(tag, ns)
-        if (value := result.get(tag)) is not None:
-            result = value
-        elif (value := result.get(ns_tag)) is not None:
-            result = value
-
-    return result.get('$', result)
+def _data_with_namespace(data: 'Data', namespace: Dict):
+    return DataWithNS(data.data, namespace)
 
 
 class Data:
@@ -55,6 +40,7 @@ class Data:
 
             children = data.get('children', [])
             return Data([c[item] for c in children if item in c])
+        return Data('')
 
     def __getitem__(self, item):
         data = self.data
@@ -69,11 +55,36 @@ class Data:
                 return '\n'.join(data)
         elif item.startswith('@'):
             att_name = item[1:]
-            if isinstance(data, list) and len(data) == 1 and isinstance(data[0], dict):
-                return data[0].get('attributes', {}).get(att_name, '')
+            if isinstance(data, list):
+                if len(data) == 1 and isinstance(data[0], dict):
+                    return data[0].get('attributes', {}).get(att_name, '')
+                return ''
+            elif isinstance(data, str):
+                return ''
             return data.get('attributes', {}).get(att_name, '')
         elif item == '*' and isinstance(data, list):
             return [Data(d) for d in data]
+
+
+class DataWithNS(Data):
+    def __init__(self, data: [Dict, List, str], ns: Dict):
+        super(DataWithNS, self).__init__(data)
+        self.ns = ns
+
+    def __getattr__(self, item):
+        name = item
+        if '__' in item:
+            ns, name = item.split('__')
+            name = '{' + self.ns.get(ns, '') + '}' + name
+
+        ret = super(DataWithNS, self).__getattr__(name)
+        return DataWithNS(ret.data, self.ns)
+
+    def __getitem__(self, item):
+        ret = super(DataWithNS, self).__getitem__(item)
+        if isinstance(ret, list):
+            return [DataWithNS(i.data) for i in ret]
+        return ret
 
 
 def build_environment(*, template_dir, asset_dir):
@@ -94,11 +105,11 @@ def build_renderer(jinja_env: Environment):
             .get_template(f'{template}.pug')\
             .render(enumerate=enumerate,
                     asset=_get_asset,
-                    getNS=_get_namespace,
+                    dataNS=_data_with_namespace,
                     **kwargs)
 
     return render
 
 
-def build_data(data: Dict) -> 'object':
+def build_data(data: Dict) -> 'Data':
     return Data(data)
