@@ -3,6 +3,7 @@ from reportlab.lib.units import cm
 from .enums import FontAlign
 
 Font = namedtuple('Font', 'family size align', defaults=['Courier', 10, FontAlign.LEFT])
+Dashes = namedtuple('Dashes', 'pattern', defaults=[[]])
 
 
 class Size(namedtuple('Size', 'width height', defaults=[0, 0])):

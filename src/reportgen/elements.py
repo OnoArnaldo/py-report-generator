@@ -5,7 +5,7 @@ from PIL import Image as _Image
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.units import pica
 from reportlab.lib.utils import ImageReader
-from .properties import Size, Margin, Element, Position, Font
+from .properties import Size, Margin, Element, Position, Font, Dashes
 from .enums import FontAlign
 
 
@@ -204,6 +204,7 @@ class Text(ReportElement):
         return 0
 
     def draw(self) -> 'Text':
+        self.canvas.saveState()
         self.canvas.setFont(self._font.family, self._font.size)
 
         if self._font.align == FontAlign.LEFT:
@@ -221,6 +222,8 @@ class Text(ReportElement):
                 self.calculated_left, self.calculated_top,
                 self._value
             )
+
+        self.canvas.restoreState()
 
         self._update_sibling()
 
@@ -256,6 +259,42 @@ class Image(ReportElement):
 
         self._update_sibling()
 
+        return self
+
+    def build_child(self, element: 'ReportElement') -> 'ReportElement':
+        raise Exception('Not allowed to call this method in "Image".')
+
+
+class Line(ReportElement):
+    def __init__(self, canvas: Canvas):
+        super(Line, self).__init__(canvas)
+
+        self._dashes = Dashes()
+        self._stroke = 1
+
+    def dashes(self, *pattern) -> 'Line':
+        self._dashes = Dashes(pattern)
+        return self
+
+    def stroke(self, stroke: float) -> 'Line':
+        self._stroke = stroke
+        return self
+
+    @cached_property
+    def calculated_height(self) -> float:
+        return self._stroke
+
+    def draw(self) -> 'Line':
+        self.canvas.saveState()
+        self.canvas.setDash(self._dashes.pattern)
+        self.canvas.setLineWidth(self._stroke)
+        self.canvas.line(
+            self.calculated_left, self.calculated_top,
+            self.calculated_width, self.calculated_top
+        )
+        self.canvas.restoreState()
+
+        self._update_sibling()
         return self
 
     def build_child(self, element: 'ReportElement') -> 'ReportElement':
