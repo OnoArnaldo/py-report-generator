@@ -92,13 +92,11 @@ from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.pagesizes import A4
 from reportgen.layout import Parser
 
-canvas = Canvas('filename.pdf', pagesize=A4, bottomup=0)
-
 parse = Parser(template_dir='/templates', data_dir='/data', asset_dir='/assets')
+
+canvas = Canvas('filename.pdf', pagesize=A4, bottomup=0)
 report = parse('invoiceLayout', 'invoice001.xml')
-
 report.process(canvas)
-
 canvas.save()
 ```
 
@@ -135,3 +133,14 @@ report
             text= item.name['$']
 ```
 
+Pugjs allows the creation of variables, which can be useful with the data structure.
+
+example:
+```jade
+- var compAddr = data.company.address
+
+report
+    page
+        text= compAddr.line1['$']
+        text= compAddr.city['$']
+```

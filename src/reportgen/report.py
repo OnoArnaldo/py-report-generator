@@ -82,6 +82,9 @@ class Box:
     def new_image(self, *args, **kwargs) -> 'Image':
         return self.new_child(Image, *args, **kwargs)
 
+    def new_line(self, *args, **kwargs) -> 'Line':
+        return self.new_child(Line, *args, **kwargs)
+
 
 @model
 class Report(Base):
@@ -183,4 +186,25 @@ class Image(BaseWithMargin):
     def process(self, builder: Callable):
         return builder(e.Image)\
             .filename(self.value)\
+            .draw()
+
+
+@model
+class Line(BaseWithMargin):
+    stroke = field(default='')
+    dashes = field(default='')
+
+    @cached_property
+    def calculated_stroke(self):
+        return int(self.stroke or '0')
+
+    @cached_property
+    def calculated_dashes(self):
+        return [int(v) for v in self.dashes.split()]
+
+    def process(self, builder: Callable):
+        return builder(e.Line)\
+            .margin(*self.calculated_margin)\
+            .stroke(self.calculated_stroke)\
+            .dashes(*self.calculated_dashes)\
             .draw()

@@ -284,13 +284,17 @@ class Line(ReportElement):
     def calculated_height(self) -> float:
         return self._stroke
 
+    @cached_property
+    def calculated_left_end(self) -> float:
+        return self.calculated_left + self.calculated_width
+
     def draw(self) -> 'Line':
         self.canvas.saveState()
         self.canvas.setDash(self._dashes.pattern)
         self.canvas.setLineWidth(self._stroke)
         self.canvas.line(
             self.calculated_left, self.calculated_top,
-            self.calculated_width, self.calculated_top
+            self.calculated_left_end, self.calculated_top
         )
         self.canvas.restoreState()
 

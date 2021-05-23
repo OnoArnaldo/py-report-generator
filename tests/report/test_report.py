@@ -14,13 +14,17 @@ def test_report(canvas):
     report = Report(name='report001', unit='cm', page_size='A4', font='Courier 10 left')
     page = report.new_page(name='page001', margin='1')
 
-    row = page.new_row(name='header001', margin='0 0 0.5 0', height='5', border='0')
-    col01 = row.new_column(name='col001', width='15', border='1', margin='0 0 0 0.2')
+    row1 = page.new_row(name='header001', margin='0 0 0.5 0', height='5', border='0')
+    col01 = row1.new_column(name='col001', width='15', border='1', margin='0 0 0 0.2')
     txt01 = col01.new_text(name='txt001', font='Courier 7 left', margin='0 0.1', value='Company name:')
     txt02 = col01.new_text(name='txt002', margin='0 1 0 0.2', value='Arnaldo Ono')
 
-    col02 = row.new_column(name='col002', border='1', margin='0 0.2 0 0')
+    col02 = row1.new_column(name='col002', border='1', margin='0 0.2 0 0')
     img01 = col02.new_image(name='img001', value=assets('150.png'))
+
+    row2 = page.new_row(name='withLines', margin='0', height='5', border='1')
+    ln01 = row2.new_line(name='continuous', margin='0.5', stroke='1')
+    ln02 = row2.new_line(name='dashed', margin='1', stroke='1', dashes='3 6 1')
 
     report.process(canvas)
 
@@ -66,6 +70,28 @@ def test_report(canvas):
           102.04724409448829,
           141.73228346456693),
          {'preserveAspectRatio': True}],
+        ['canvas/roundRect(..)',
+         (28.346456692913385,
+          184.251968503937,
+          538.5826771653544,
+          141.73228346456693,
+          5.0,
+          1),
+         {}],
+        ['canvas/saveState(..)', (), {}],
+        ['canvas/setDash(..)', ((),), {}],
+        ['canvas/setLineWidth(..)', (1,), {}],
+        ['canvas/line(..)',
+         (42.519685039370074, 198.4251968503937, 552.7559055118111, 198.4251968503937),
+         {}],
+        ['canvas/restoreState(..)', (), {}],
+        ['canvas/saveState(..)', (), {}],
+        ['canvas/setDash(..)', ((3, 6, 1),), {}],
+        ['canvas/setLineWidth(..)', (1,), {}],
+        ['canvas/line(..)',
+         (56.69291338582677, 241.9448818897638, 538.5826771653544, 241.9448818897638),
+         {}],
+        ['canvas/restoreState(..)', (), {}],
         ['canvas/showPage(..)', (), {}],
         ['canvas/save(..)', (), {}]
     ]
