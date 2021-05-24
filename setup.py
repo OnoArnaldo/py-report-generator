@@ -6,7 +6,7 @@ long_description = (here / 'README.md').read_text(encoding='utf-8')
 
 setup(
     name='reportgen',
-    version='1.0.0.7',
+    version='1.0.0.8',
     description='Generate pdf report from xml, and using pugjs-based template',
     long_description=long_description,
     long_description_content_type='text/markdown',

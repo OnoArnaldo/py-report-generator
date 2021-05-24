@@ -77,3 +77,9 @@ class Parser:
                         v = v.get('children', [''])[0]
 
                     parent.new_image(name=att.get('id', ''), value=str(v))
+
+                elif k.upper() == 'LINE':
+                    parent.new_line(name=att.get('id', ''),
+                                    margin=att.get('margin', ''),
+                                    stroke=att.get('stroke', ''),
+                                    dashes=att.get('dashes', ''))
