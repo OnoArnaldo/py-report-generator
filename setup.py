@@ -6,7 +6,7 @@ long_description = (here / 'README.md').read_text(encoding='utf-8')
 
 setup(
     name='reportgen',
-    version='1.0.0.9',
+    version='1.0.0.10',
     description='Generate pdf report from xml, and using pugjs-based template',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -21,7 +21,7 @@ setup(
     ],
 
     keywords='pdf generator, development',
-    package_dir={'': 'src'},
+    package_dir={'': 'src', 'reportgen': 'src/reportgen'},
     packages=find_packages(where='src'),
     python_requires='>=3.9, <4',
 
@@ -29,4 +29,7 @@ setup(
     extras_require={
         'test': ['pytest'],
     },
+
+    include_package_data=True,
+    package_data={'reportgen': ['utils/data/*.csv']},
 )
