@@ -42,8 +42,10 @@ report#report-id(page-size unit font)
   page#page-id(margin font)
     row#row-id(margin font border height)
     column#column-id(margin font border width)
+    line#line-id(margin stroke dashes)
     text#text-id(margin font) value #{withVariables}
     image#image-id(margin) fileName
+    barcode#barcode-id(margin height code-set bar-width align) value
 ```
 
 > Note that:
@@ -54,6 +56,23 @@ report#report-id(page-size unit font)
 
 > For more complex example, please go to the end of this document 
 
+#### The attributes
+
+* **font-size**: A0 to A9, B0 to B9, C0 to C9, ELEVENSEVENTEEN, GOV_LEGAL, GOV_LETTER, HALF_LETTER, JUNIOR_LEGAL, LEDGER, LETTER, TABLOID
+* **unit**: cm, inch, mm, pica
+* **font**: use the pattern `font-family size alignment`
+    * font-family: Courier, Courier-Bold, Courier-BoldOblique, Courier-Oblique, Helvetica, Helvetica-Bold, Helvetica-BoldOblique, Helvetica-Oblique, Symbol, Times-Bold, Times-BoldItalic, Times-Italic, Times-Roman, ZapfDingbats
+        * note that the font weight is a different font family.
+    * alignment: left, center, right
+* **margin**: `top left bottom right`, below are the short expressions and the equivalent.
+    * `5` = `5 5 5 5`
+    * `5 6` = `5 6 5 6`
+    * `5 6 7` = `5 6 7 0`
+* **dashes**: it is a list of integers representing the length of the point on and off. Below are some valid examples.
+    * `3 2` = ---  ---  ---
+    * `3 6 1 2` = ---      -  ---      -
+* **code-set**: 128A, 128B, 128C
+* **bar-width**: this is the width of a single bar.
 
 ## XML data
 
