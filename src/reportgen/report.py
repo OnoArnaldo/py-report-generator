@@ -85,6 +85,9 @@ class Box:
     def new_line(self, *args, **kwargs) -> 'Line':
         return self.new_child(Line, *args, **kwargs)
 
+    def new_barcode(self, *args, **kwargs) -> 'Barcode':
+        return self.new_child(Barcode, *args, **kwargs)
+
 
 @model
 class Report(Base):
@@ -207,4 +210,41 @@ class Line(BaseWithMargin):
             .margin(*self.calculated_margin)\
             .stroke(self.calculated_stroke)\
             .dashes(*self.calculated_dashes)\
+            .draw()
+
+
+@model
+class Barcode(BaseWithMargin):
+    name = field(default='')
+    height = field(default='')
+    code_set = field(default='')
+    bar_width = field(default='')
+    align = field(default='')
+    value = field(default='')
+
+    @cached_property
+    def calculated_height(self):
+        return float(self.height or 0)
+
+    @cached_property
+    def calculated_bar_width(self):
+        return float(self.bar_width) * self.calculated_unit
+
+    @cached_property
+    def calculated_align(self):
+        if self.align.upper() == 'LEFT':
+            return e.FontAlign.LEFT
+        elif self.align.upper() == 'CENTER':
+            return e.FontAlign.CENTER
+        elif self.align.upper() == 'RIGHT':
+            return e.FontAlign().RIGHT
+
+    def process(self, builder: Callable):
+        return builder(e.Barcode) \
+            .align(self.calculated_align) \
+            .height(self.calculated_height) \
+            .bar_width(self.calculated_bar_width) \
+            .margin(*self.calculated_margin) \
+            .code_set(self.code_set) \
+            .value(self.value) \
             .draw()

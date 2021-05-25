@@ -7,6 +7,7 @@ from reportlab.lib.units import pica
 from reportlab.lib.utils import ImageReader
 from .properties import Size, Margin, Element, Position, Font, Dashes
 from .enums import FontAlign
+from .utils.barcode128 import barcode
 
 
 class ReportElement:
@@ -302,7 +303,93 @@ class Line(ReportElement):
         return self
 
     def build_child(self, element: 'ReportElement') -> 'ReportElement':
-        raise Exception('Not allowed to call this method in "Image".')
+        raise Exception('Not allowed to call this method in "Line".')
+
+
+class Barcode(ReportElement):
+    def __init__(self, canvas: Canvas):
+        super(Barcode, self).__init__(canvas)
+
+        self._bar_width = 0
+        self._height = 0
+        self._align = FontAlign.LEFT
+        self._value = ''
+        self._code_set = ''
+
+        self._bar_left = 0
+
+    def bar_width(self, value: int) -> 'Barcode':
+        self._bar_width = value
+        return self
+
+    def height(self, value: float) -> 'Barcode':
+        self._height = value
+        return self
+
+    def value(self, value: str) -> 'Barcode':
+        self._value = value
+        return self
+
+    def code_set(self, value: str) -> 'Barcode':
+        self._code_set = value
+        return self
+
+    def align(self, value: FontAlign) -> 'Barcode':
+        self._align = value
+        return self
+
+    @cached_property
+    def calculated_value(self):
+        return barcode(self._value, self._code_set)
+
+    @cached_property
+    def calculated_bar_width(self):
+        bars = sum([int(v) for v in self.calculated_value])
+        return bars*self._bar_width
+
+    @cached_property
+    def calculated_left(self) -> float:
+        if self._align == FontAlign.LEFT:
+            return self.parent.position.left + self._margin.left
+        elif self._align == FontAlign.CENTER:
+            bar = self.calculated_bar_width / 2
+            return self.parent.position.left + (self.parent.size.width / 2) - bar
+        elif self._align == FontAlign.RIGHT:
+            bar = self.calculated_bar_width
+            return self.parent.position.left + self.parent.size.width - self._margin.right - bar
+        return 0
+
+    @cached_property
+    def calculated_height(self) -> float:
+        adjusted_height = self.parent.size.height - self._margin.vertical
+
+        if self._height:
+            return min(self._height, adjusted_height)
+        return adjusted_height
+
+    def draw(self) -> 'ReportElement':
+        code = self.calculated_value
+
+        left = self.calculated_left
+        fill = 1
+        for i, v in enumerate(code):
+            width = int(v) * self._bar_width
+            self.canvas.rect(
+                left, self.calculated_top,
+                width, self.calculated_height,
+                fill=fill, stroke=0)
+
+            fill = 0 if fill else 1
+            left += width
+
+        self._bar_left = left
+
+        self._update_sibling()
+
+        return self
+
+    def build_child(self, element: 'ReportElement') -> 'ReportElement':
+        raise Exception('Not allowed to call this method in "Barcode".')
 
 
 class PageBreak:

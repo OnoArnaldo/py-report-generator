@@ -83,3 +83,16 @@ class Parser:
                                     margin=att.get('margin', ''),
                                     stroke=att.get('stroke', ''),
                                     dashes=att.get('dashes', ''))
+
+                elif k.upper() == 'BARCODE':
+                    if isinstance(v, dict):
+                        v = v.get('children', [''])[0]
+
+                    parent.new_barcode(name=att.get('id', ''),
+                                       margin=att.get('margin', ''),
+                                       bar_width=att.get('bar-width', ''),
+                                       height=att.get('height', ''),
+                                       align=att.get('align', ''),
+                                       code_set=att.get('code-set', ''),
+                                       value=v)
+
