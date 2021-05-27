@@ -119,6 +119,25 @@ report.process(canvas)
 canvas.save()
 ```
 
+Functions and extra data can be added to the template by passing them to the parser.
+
+```python
+import textwrap
+[...]
+
+report = parse('invoiceLayout', 'invoice001.xml', textwrap=textwrap, title='The title')
+report.process(canvas)
+[...]
+```
+
+```jade
+report
+    page
+        text= title
+        each line in textwrap(data.longText['$'], 50)
+            text= line
+```
+
 # Complex example
 
 The reportgen will send the xml data to the template using the variable `data`.
