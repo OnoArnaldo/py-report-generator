@@ -58,7 +58,7 @@ report#report-id(page-size unit font)
 
 #### The attributes
 
-* **font-size**: A0 to A9, B0 to B9, C0 to C9, ELEVENSEVENTEEN, GOV_LEGAL, GOV_LETTER, HALF_LETTER, JUNIOR_LEGAL, LEDGER, LETTER, TABLOID
+* **page-size**: A0 to A9, B0 to B9, C0 to C9, ELEVENSEVENTEEN, GOV_LEGAL, GOV_LETTER, HALF_LETTER, JUNIOR_LEGAL, LEDGER, LETTER, TABLOID
 * **unit**: cm, inch, mm, pica
 * **font**: use the pattern `font-family size alignment`
     * font-family: Courier, Courier-Bold, Courier-BoldOblique, Courier-Oblique, Helvetica, Helvetica-Bold, Helvetica-BoldOblique, Helvetica-Oblique, Symbol, Times-Bold, Times-BoldItalic, Times-Italic, Times-Roman, ZapfDingbats
