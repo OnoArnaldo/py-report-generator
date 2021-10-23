@@ -68,9 +68,9 @@ report#report-id(page-size unit font)
     * `5` = `5 5 5 5`
     * `5 6` = `5 6 5 6`
     * `5 6 7` = `5 6 7 0`
-* **dashes**: it is a list of integers representing the length of the point on and off. Below are some valid examples.
-    * `3 2` = ---  ---  ---
-    * `3 6 1 2` = ---      -  ---      -
+* **dashes**: it is a list of integers representing the length of the point on and off. Below are some valid examples (dots represent spaces).
+    * `3 2` = ---..---..---..
+    * `3 6 1 2` = ---......-..---......-..
 * **code-set**: 128A, 128B, 128C
 * **bar-width**: this is the width of a single bar.
 
