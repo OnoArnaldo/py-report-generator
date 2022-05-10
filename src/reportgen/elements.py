@@ -1,5 +1,5 @@
+import typing as _
 from abc import ABC
-from typing import ClassVar
 from functools import cached_property
 from PIL import Image as _Image
 from reportlab.pdfgen.canvas import Canvas
@@ -8,6 +8,8 @@ from reportlab.lib.utils import ImageReader
 from .properties import Size, Margin, Element, Position, Font, Dashes
 from .enums import FontAlign
 from .utils.barcode128 import barcode
+
+TReportElement = _.TypeVar('TReportElement', bound='ReportElement')
 
 
 class ReportElement:
@@ -21,15 +23,15 @@ class ReportElement:
         self.sibling = Element('Sibling')
         self.child = Element('Child')
 
-    def parent_size(self, width: float, height: float) -> 'ReportElement':
+    def parent_size(self, width: float, height: float) -> TReportElement:
         self.parent.size = Size(width, height)
         return self
 
-    def parent_position(self, top: float, left: float) -> 'ReportElement':
+    def parent_position(self, top: float, left: float) -> TReportElement:
         self.parent.position = Position(top, left)
         return self
 
-    def margin(self, *values) -> 'ReportElement':
+    def margin(self, *values) -> TReportElement:
         if len(values) == 1:
             m = values * 4
         elif len(values) == 2:
@@ -62,29 +64,30 @@ class ReportElement:
 
         if self._size.height:
             return min(self._size.height, adjusted_height)
+
         return adjusted_height
 
-    def build_sibling(self, element: ClassVar['ReportElement']) -> 'ReportElement':
+    def build_sibling(self, element: _.Type[TReportElement]) -> TReportElement:
         return element(self.canvas) \
             .parent_size(*self.sibling.size) \
             .parent_position(*self.sibling.position)
 
-    def build_child(self, element: ClassVar['ReportElement']) -> 'ReportElement':
+    def build_child(self, element: _.Type[TReportElement]) -> TReportElement:
         return element(self.canvas) \
             .parent_size(*self.child.size) \
             .parent_position(*self.child.position)
 
-    def _update_sibling(self):
+    def _update_sibling(self) -> _.NoReturn:
         self.sibling.position = Position(
             self.parent.position.top + self.calculated_height + self._margin.vertical,
             self.parent.position.left
         )
 
-        self.sibling.size = self.parent.size._replace(
+        self.sibling.size = self.parent.size.replace(
             height=self.parent.size.height - self.calculated_height - self._margin.vertical
         )
 
-    def _update_child(self):
+    def _update_child(self) -> _.NoReturn:
         self.child.position = Position(
             self.parent.position.top + self._margin.top,
             self.parent.position.left + self._margin.left
@@ -97,7 +100,7 @@ class ReportElement:
             end.top - start.top
         )
 
-    def draw(self) -> 'ReportElement':
+    def draw(self) -> TReportElement:
         raise NotImplementedError('Method "draw" was not implemented.')
 
 
@@ -108,24 +111,24 @@ class Box(ReportElement, ABC):
         self._radius = 5.0
         self._stroke = 1
 
-    def size(self, width: float, height: float) -> 'ReportElement':
+    def size(self, width: float, height: float) -> TReportElement:
         self._size = Size(width, height)
         return self
 
-    def radius(self, radius: float) -> 'ReportElement':
+    def radius(self, radius: float) -> TReportElement:
         self._radius = radius
         return self
 
-    def stroke(self, stroke: float) -> 'ReportElement':
+    def stroke(self, stroke: float) -> TReportElement:
         self._stroke = stroke
         return self
 
 
 class Row(Box):
-    def height(self, height: float = 0.0) -> 'ReportElement':
+    def height(self, height: float = 0.0) -> TReportElement:
         return self.size(0.0, height)
 
-    def draw(self) -> 'Row':
+    def draw(self) -> TReportElement:
         if self._stroke != 0:
             self.canvas.roundRect(
                 self.calculated_left, self.calculated_top,
@@ -140,20 +143,20 @@ class Row(Box):
 
 
 class Column(Box):
-    def width(self, width: float = 0.0) -> 'ReportElement':
+    def width(self, width: float = 0.0) -> TReportElement:
         return self.size(width, 0.0)
 
-    def _update_sibling(self):
+    def _update_sibling(self) -> _.NoReturn:
         self.sibling.position = Position(
             self.parent.position.top,
             self.parent.position.left + self.calculated_width + self._margin.horizontal
         )
 
-        self.sibling.size = self.parent.size._replace(
+        self.sibling.size = self.parent.size.replace(
             width=self.parent.size.width - self.calculated_width - self._margin.horizontal
         )
 
-    def draw(self) -> 'Column':
+    def draw(self) -> TReportElement:
         if self._stroke != 0:
             self.canvas.roundRect(
                 self.calculated_left, self.calculated_top,
@@ -174,11 +177,11 @@ class Text(ReportElement):
         self._value = ''
         self._font = Font()
 
-    def value(self, value: str) -> 'Text':
+    def value(self, value: str) -> TReportElement:
         self._value = value
         return self
 
-    def font(self, family: str, size: int, align: FontAlign = FontAlign.LEFT) -> 'Text':
+    def font(self, family: str, size: int, align: FontAlign = FontAlign.LEFT) -> TReportElement:
         self._font = Font(family, size, align)
         return self
 
@@ -204,7 +207,7 @@ class Text(ReportElement):
             return self.parent.position.left + self.parent.size.width - self._margin.right
         return 0
 
-    def draw(self) -> 'Text':
+    def draw(self) -> TReportElement:
         self.canvas.saveState()
         self.canvas.setFont(self._font.family, self._font.size)
 
@@ -230,7 +233,7 @@ class Text(ReportElement):
 
         return self
 
-    def build_child(self, element: 'ReportElement') -> 'ReportElement':
+    def build_child(self, element: TReportElement) -> TReportElement:
         raise Exception('Not allowed to call this method in "Text".')
 
 
@@ -240,7 +243,7 @@ class Image(ReportElement):
 
         self._filename = ''
 
-    def filename(self, _filename: str) -> 'Image':
+    def filename(self, _filename: str) -> TReportElement:
         self._filename = _filename
         return self
 
@@ -250,7 +253,7 @@ class Image(ReportElement):
 
         return ImageReader(image)
 
-    def draw(self) -> 'Image':
+    def draw(self) -> TReportElement:
         self.canvas.drawImage(
             self._image_reader(),
             self.calculated_left, self.calculated_top,
@@ -262,7 +265,7 @@ class Image(ReportElement):
 
         return self
 
-    def build_child(self, element: 'ReportElement') -> 'ReportElement':
+    def build_child(self, element: TReportElement) -> TReportElement:
         raise Exception('Not allowed to call this method in "Image".')
 
 
@@ -273,11 +276,11 @@ class Line(ReportElement):
         self._dashes = Dashes()
         self._stroke = 1
 
-    def dashes(self, *pattern) -> 'Line':
+    def dashes(self, *pattern: str) -> TReportElement:
         self._dashes = Dashes(pattern)
         return self
 
-    def stroke(self, stroke: float) -> 'Line':
+    def stroke(self, stroke: float) -> TReportElement:
         self._stroke = stroke
         return self
 
@@ -289,7 +292,7 @@ class Line(ReportElement):
     def calculated_left_end(self) -> float:
         return self.calculated_left + self.calculated_width
 
-    def draw(self) -> 'Line':
+    def draw(self) -> TReportElement:
         self.canvas.saveState()
         self.canvas.setDash(self._dashes.pattern)
         self.canvas.setLineWidth(self._stroke)
@@ -302,7 +305,7 @@ class Line(ReportElement):
         self._update_sibling()
         return self
 
-    def build_child(self, element: 'ReportElement') -> 'ReportElement':
+    def build_child(self, element: TReportElement) -> TReportElement:
         raise Exception('Not allowed to call this method in "Line".')
 
 
@@ -310,40 +313,40 @@ class Barcode(ReportElement):
     def __init__(self, canvas: Canvas):
         super(Barcode, self).__init__(canvas)
 
-        self._bar_width = 0
-        self._height = 0
-        self._align = FontAlign.LEFT
-        self._value = ''
-        self._code_set = ''
+        self._bar_width: float = 0
+        self._height: float = 0
+        self._align: FontAlign = FontAlign.LEFT
+        self._value: str = ''
+        self._code_set: str = ''
 
-        self._bar_left = 0
+        self._bar_left: float = 0
 
-    def bar_width(self, value: int) -> 'Barcode':
+    def bar_width(self, value: int) -> TReportElement:
         self._bar_width = value
         return self
 
-    def height(self, value: float) -> 'Barcode':
+    def height(self, value: float) -> TReportElement:
         self._height = value
         return self
 
-    def value(self, value: str) -> 'Barcode':
+    def value(self, value: str) -> TReportElement:
         self._value = value
         return self
 
-    def code_set(self, value: str) -> 'Barcode':
+    def code_set(self, value: str) -> TReportElement:
         self._code_set = value
         return self
 
-    def align(self, value: FontAlign) -> 'Barcode':
+    def align(self, value: FontAlign) -> TReportElement:
         self._align = value
         return self
 
     @cached_property
-    def calculated_value(self):
+    def calculated_value(self) -> list[int]:
         return barcode(self._value, self._code_set)
 
     @cached_property
-    def calculated_bar_width(self):
+    def calculated_bar_width(self) -> float:
         bars = sum([int(v) for v in self.calculated_value])
         return bars*self._bar_width
 
@@ -367,7 +370,7 @@ class Barcode(ReportElement):
             return min(self._height, adjusted_height)
         return adjusted_height
 
-    def draw(self) -> 'ReportElement':
+    def draw(self) -> TReportElement:
         code = self.calculated_value
 
         left = self.calculated_left
@@ -388,7 +391,7 @@ class Barcode(ReportElement):
 
         return self
 
-    def build_child(self, element: 'ReportElement') -> 'ReportElement':
+    def build_child(self, element: TReportElement) -> TReportElement:
         raise Exception('Not allowed to call this method in "Barcode".')
 
 
@@ -396,6 +399,6 @@ class PageBreak:
     def __init__(self, canvas: Canvas):
         self.canvas = canvas
 
-    def draw(self) -> 'PageBreak':
+    def draw(self: TReportElement) -> TReportElement:
         self.canvas.showPage()
         return self

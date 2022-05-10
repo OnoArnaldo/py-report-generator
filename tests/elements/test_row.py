@@ -1,4 +1,3 @@
-from pytest import approx
 from reportlab.lib import pagesizes
 from reportlab.lib.units import cm
 from reportgen.elements import Row

@@ -1,11 +1,11 @@
-import os
+from pathlib import Path
 from reportgen.layout import Parser
 from ..utils import Ignore
 
-ROOT = os.path.abspath(os.path.dirname(__file__))
-TEMPLATE = os.path.join(ROOT, 'templates')
-DATA = os.path.join(ROOT, 'data')
-ASSET = os.path.join(ROOT, 'assets')
+ROOT = Path(__file__).parent
+TEMPLATE = ROOT.joinpath('templates')
+DATA = ROOT.joinpath('data')
+ASSET = ROOT.joinpath('assets')
 
 
 def test_layout(canvas):

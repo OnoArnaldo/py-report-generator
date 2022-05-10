@@ -5,7 +5,7 @@ This library helps to generate pdf report using a template with pugjs syntax and
 # Installation
 
 ```shell
-python3.9 -m venv venv
+python3.10 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
 pip install git+https://github.com/OnoArnaldo/py-report-generator.git

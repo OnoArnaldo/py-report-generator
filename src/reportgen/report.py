@@ -1,9 +1,11 @@
-from typing import ClassVar, Tuple, Callable, List
+import typing as _
 from functools import cached_property
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib import pagesizes, units
 from .utils.model import model, field
 from . import elements as e
+
+TBase = _.TypeVar('TBase')
 
 
 @model
@@ -15,7 +17,7 @@ class Base:
     children = field(default_factory=list, repr=False, init=False)
 
     @cached_property
-    def calculated_page_size(self) -> Tuple:
+    def calculated_page_size(self) -> tuple:
         if hasattr(self, 'page_size'):
             return getattr(pagesizes, self.page_size.upper())
         if self.parent:
@@ -31,14 +33,14 @@ class Base:
         return units.cm
 
     @cached_property
-    def calculated_font(self) -> Tuple:
+    def calculated_font(self) -> tuple:
         if self.font != '':
             family, size, align = self.font.split()
             return family, int(size), getattr(e.FontAlign, align.upper(), e.FontAlign.LEFT)
         elif self.parent:
             return self.parent.calculated_font
 
-    def new_child(self, cls: ClassVar['Base'], *args, **kwargs) -> 'Base':
+    def new_child(self, cls: _.Type[TBase], *args, **kwargs) -> TBase:
         child = cls(*args, **kwargs)
 
         child.parent = self
@@ -52,7 +54,7 @@ class BaseWithMargin(Base):
     margin = field(default='')
 
     @cached_property
-    def calculated_margin(self) -> List:
+    def calculated_margin(self) -> list:
         unit = self.calculated_unit
         if isinstance(self.margin, (int, float)):
             margin = [self.margin*unit]
@@ -69,7 +71,7 @@ class BaseWithMargin(Base):
         return margin
 
 
-class Box:
+class Box(Base):
     def new_row(self, *args, **kwargs) -> 'Row':
         return self.new_child(Row, *args, **kwargs)
 
@@ -97,14 +99,14 @@ class Report(Base):
     def new_page(self, *args, **kwargs) -> 'Page':
         return self.new_child(Page, *args, **kwargs)
 
-    def process(self, canvas: Canvas):
+    def process(self, canvas: Canvas) -> _.NoReturn:
         for page in self.children:
             page.process(canvas)
 
 
 @model
 class Page(BaseWithMargin, Box):
-    def process(self, canvas: Canvas):
+    def process(self, canvas: Canvas) -> _.NoReturn:
         page = e.Row(canvas)\
             .parent_size(*self.calculated_page_size)\
             .parent_position(0, 0)\
@@ -131,7 +133,7 @@ class Row(BaseWithMargin, Box):
     def calculated_border(self) -> float:
         return int(self.border or 0)
 
-    def process(self, builder: Callable):
+    def process(self, builder: _.Callable) -> 'Row':
         row: e.Row = builder(e.Row)\
             .margin(*self.calculated_margin)\
             .height(self.calculated_height)\
@@ -157,7 +159,7 @@ class Column(BaseWithMargin, Box):
     def calculated_border(self) -> float:
         return int(self.border or 0)
 
-    def process(self, builder: Callable):
+    def process(self, builder: _.Callable) -> 'Column':
         column = builder(e.Column)\
             .margin(*self.calculated_margin)\
             .width(self.calculated_width)\
@@ -174,7 +176,7 @@ class Column(BaseWithMargin, Box):
 class Text(BaseWithMargin):
     value = field(default='')
 
-    def process(self, builder: Callable):
+    def process(self, builder: _.Callable) -> 'Text':
         return builder(e.Text)\
             .margin(*self.calculated_margin)\
             .font(*self.calculated_font)\
@@ -186,7 +188,7 @@ class Text(BaseWithMargin):
 class Image(BaseWithMargin):
     value = field(default='')
 
-    def process(self, builder: Callable):
+    def process(self, builder: _.Callable) -> 'Image':
         return builder(e.Image)\
             .filename(self.value)\
             .draw()
@@ -198,14 +200,14 @@ class Line(BaseWithMargin):
     dashes = field(default='')
 
     @cached_property
-    def calculated_stroke(self):
+    def calculated_stroke(self) -> int:
         return int(self.stroke or '0')
 
     @cached_property
-    def calculated_dashes(self):
+    def calculated_dashes(self) -> list:
         return [int(v) for v in self.dashes.split()]
 
-    def process(self, builder: Callable):
+    def process(self, builder: _.Callable) -> 'Line':
         return builder(e.Line)\
             .margin(*self.calculated_margin)\
             .stroke(self.calculated_stroke)\
@@ -223,15 +225,15 @@ class Barcode(BaseWithMargin):
     value = field(default='')
 
     @cached_property
-    def calculated_height(self):
+    def calculated_height(self) -> float:
         return float(self.height or 0)
 
     @cached_property
-    def calculated_bar_width(self):
+    def calculated_bar_width(self) -> float:
         return float(self.bar_width) * self.calculated_unit
 
     @cached_property
-    def calculated_align(self):
+    def calculated_align(self) -> e.FontAlign:
         if self.align.upper() == 'LEFT':
             return e.FontAlign.LEFT
         elif self.align.upper() == 'CENTER':
@@ -239,7 +241,7 @@ class Barcode(BaseWithMargin):
         elif self.align.upper() == 'RIGHT':
             return e.FontAlign().RIGHT
 
-    def process(self, builder: Callable):
+    def process(self, builder: _.Callable) -> 'Barcode':
         return builder(e.Barcode) \
             .align(self.calculated_align) \
             .height(self.calculated_height) \

@@ -1,4 +1,4 @@
-from typing import NoReturn, Any, Callable
+import typing as _
 import sys
 
 
@@ -10,7 +10,7 @@ class MISSINGTYPE:
 MISSING = MISSINGTYPE()
 
 
-def _init_fields(cls: object) -> NoReturn:
+def _init_fields(cls: _.Type) -> _.NoReturn:
     fields = {}
     for c in cls.__mro__[-1:0:-1]:
         if (flds := getattr(c, '_fields', None)) is not None:
@@ -25,7 +25,7 @@ def _init_fields(cls: object) -> NoReturn:
     setattr(cls, '_fields', fields)
 
 
-def _exec(cls: object, code: str) -> NoReturn:
+def _exec(cls: _.Type, code: str) -> _.NoReturn:
     globs = sys.modules[cls.__module__].__dict__
     fs = {}
     exec(code, globs, fs)
@@ -34,7 +34,7 @@ def _exec(cls: object, code: str) -> NoReturn:
         setattr(cls, k, v)
 
 
-def _build_init(cls: object, frozen: bool = False) -> NoReturn:
+def _build_init(cls: _.Type, frozen: bool = False) -> _.NoReturn:
     code = 'def __init__(self, {args}):\n{setters}'
     args = ', '.join([f'{v.name}={v.defaulter}'
                       for v in cls._fields.values()
@@ -57,7 +57,7 @@ def _build_init(cls: object, frozen: bool = False) -> NoReturn:
     _exec(cls, code.format(args=args, setters=setters))
 
 
-def _build_repr(cls: object) -> NoReturn:
+def _build_repr(cls: _.Type) -> _.NoReturn:
     code = 'def __repr__(self):\n    return f"{clsname}({reprs})"'
     clsname = cls.__name__
     reprs = ', '.join([f'{v.name}: {{self.{v.name}!r}}'
@@ -67,7 +67,7 @@ def _build_repr(cls: object) -> NoReturn:
     _exec(cls, code.format(clsname=clsname, reprs=reprs))
 
 
-def _build_readonly(cls: object, frozen: bool = False) -> NoReturn:
+def _build_readonly(cls: _.Type, frozen: bool = False) -> _.NoReturn:
     if not frozen:
         return
 
@@ -80,11 +80,11 @@ def _build_readonly(cls: object, frozen: bool = False) -> NoReturn:
     _exec(cls, code)
 
 
-def model(cls: object = None, /, *, frozen: bool = False) -> object:
+def model(cls: _.Type = None, /, *, frozen: bool = False) -> _.Callable:
     """
     Class decorator to build __init__ and __repr__ methods based on the fields.
     """
-    def _model(cls):
+    def _model(cls: _.Type):
         _init_fields(cls)
         _build_init(cls, frozen)
         _build_repr(cls)
@@ -114,9 +114,9 @@ class field:
     )
 
     def __init__(self,
-                 default: Any = MISSING,
-                 default_factory: Callable = MISSING,
-                 set_factory: Callable = MISSING,
+                 default: _.Any = MISSING,
+                 default_factory: _.Callable = MISSING,
+                 set_factory: _.Callable = MISSING,
                  init: bool = True,
                  repr: bool = True):
 

@@ -1,30 +1,30 @@
-import os
-from typing import Dict, List
+import typing as _
+from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from pypugjs.ext.jinja import PyPugJSExtension
 
 asset_folder = ''
 
 
-def _get_asset(fname):
-    return os.path.join(asset_folder, fname)
+def _get_asset(fname: str) -> Path:
+    return Path(asset_folder, fname)
 
 
-def _data_with_namespace(data: 'Data', namespace: Dict):
+def _data_with_namespace(data: 'Data', namespace: _.Dict) -> 'DataWithNS':
     return DataWithNS(data.data, namespace)
 
 
 class Data:
-    def __init__(self, data: [Dict, List, str]):
+    def __init__(self, data: _.Dict | _.List | str):
         self.data = data
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'Data({self.data!r})'
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'Data') -> bool:
         return self.data == getattr(other, 'data', None)
 
-    def __getattr__(self, item):
+    def __getattr__(self, item: _.Any) -> 'Data':
         data = self.data
         if isinstance(data, dict):
             if item in data:
@@ -41,7 +41,7 @@ class Data:
             return Data([c[item] for c in children if item in c])
         return Data('')
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: str) -> str | list['Data']:
         data = self.data
         if item == '$':
             if isinstance(data, str):
@@ -66,11 +66,11 @@ class Data:
 
 
 class DataWithNS(Data):
-    def __init__(self, data: [Dict, List, str], ns: Dict):
+    def __init__(self, data: dict | list | str, ns: _.Dict):
         super(DataWithNS, self).__init__(data)
         self.ns = ns
 
-    def __getattr__(self, item):
+    def __getattr__(self, item: str) -> 'Data':
         name = item
         if '__' in item:
             ns, name = item.split('__')
@@ -79,14 +79,14 @@ class DataWithNS(Data):
         ret = super(DataWithNS, self).__getattr__(name)
         return DataWithNS(ret.data, self.ns)
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: str) -> str | list['Data']:
         ret = super(DataWithNS, self).__getitem__(item)
         if isinstance(ret, list):
             return [DataWithNS(i.data, self.ns) for i in ret]
         return ret
 
 
-def build_environment(*, template_dir, asset_dir):
+def build_environment(*, template_dir: Path, asset_dir: Path) -> Environment:
     global asset_folder
     asset_folder = asset_dir
 
@@ -98,7 +98,7 @@ def build_environment(*, template_dir, asset_dir):
     )
 
 
-def build_renderer(jinja_env: Environment):
+def build_renderer(jinja_env: Environment) -> _.Callable:
     def render(template, **kwargs):
         return jinja_env\
             .get_template(f'{template}.pug')\
@@ -110,5 +110,5 @@ def build_renderer(jinja_env: Environment):
     return render
 
 
-def build_data(data: Dict) -> 'Data':
+def build_data(data: _.Dict | _.List | str) -> 'Data':
     return Data(data)

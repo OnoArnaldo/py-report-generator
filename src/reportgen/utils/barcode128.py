@@ -1,30 +1,50 @@
-import os
-from typing import Dict, List
-from functools import cache
-from collections import namedtuple
 import csv
+from pathlib import Path
+from dataclasses import dataclass
+from functools import cache
+from .base import Base
 
-ROOT = os.path.abspath(os.path.dirname(__file__))
-DATA_DIR = os.path.join(ROOT, 'data')
+ROOT = Path(__file__).parent
+DATA_DIR = ROOT.joinpath('data')
 
-Barcode = namedtuple('Barcode', 'filename column start stop')
-Value = namedtuple('Value', 'value hex A B C code latin1 pattern width')
+
+@dataclass
+class Barcode(Base):
+    filename: Path
+    column: str
+    start: str
+    stop: str
+
+
+@dataclass
+class Value(Base):
+    value: str
+    hex: str
+    A: str
+    B: str
+    C: str
+    code: str
+    latin1: str
+    pattern: str
+    width: float
+
+
 barcodes = {
-    '128A': Barcode(os.path.join(DATA_DIR, 'barcode128.csv'), 'A', 'Start Code A', 'Stop'),
-    '128B': Barcode(os.path.join(DATA_DIR, 'barcode128.csv'), 'B', 'Start Code B', 'Stop'),
-    '128C': Barcode(os.path.join(DATA_DIR, 'barcode128.csv'), 'C', 'Start Code C', 'Stop'),
+    '128A': Barcode(DATA_DIR.joinpath('barcode128.csv'), 'A', 'Start Code A', 'Stop'),
+    '128B': Barcode(DATA_DIR.joinpath('barcode128.csv'), 'B', 'Start Code B', 'Stop'),
+    '128C': Barcode(DATA_DIR.joinpath('barcode128.csv'), 'C', 'Start Code C', 'Stop'),
 }
 final_bar = '2'
 
 
 @cache
-def get_codes(fname: str, column: str = '128C') -> Dict:
+def get_codes(fname: Path | str, column: str = '128C') -> dict:
     res = {}
     with open(fname) as f:
         reader = csv.reader(f)
         for row in reader:
             value = Value(*row)
-            res[getattr(value, column)] = value._replace(value=int(value.value))
+            res[getattr(value, column)] = value.replace(value=int(value.value))
     f.close()
     return res
 
@@ -35,7 +55,7 @@ def _adjust_size(value: str) -> str:
     return zero + value
 
 
-def barcode(value: str, key: str = '128C') -> List[int]:
+def barcode(value: str, key: str = '128C') -> list[int]:
     value = _adjust_size(value)
 
     bc = barcodes.get(key)
@@ -47,7 +67,7 @@ def barcode(value: str, key: str = '128C') -> List[int]:
 
     pos = 1
     for i in range(0, len(value), 2):
-        v = value[i:i+2]
+        v = value[i:i + 2]
 
         code = codes[v]
         ret += code.width
@@ -55,7 +75,7 @@ def barcode(value: str, key: str = '128C') -> List[int]:
 
         pos += 1
 
-    checksum = codes[f'{check%103:0>2}']
+    checksum = codes[f'{check % 103:0>2}']
     ret += checksum.width
 
     stop = codes[bc.stop]

@@ -26,7 +26,7 @@ def test_column(canvas):
          {}],
         ['canvas/restoreState(..)', (), {}],
         ['canvas/saveState(..)', (), {}],
-        ['canvas/setDash(..)', ([],), {}],
+        ['canvas/setDash(..)', ((),), {}],
         ['canvas/setLineWidth(..)', (1,), {}],
         ['canvas/line(..)',
          (28.346456692913385, 86.03937007874015, 566.9291338582678, 86.03937007874015),

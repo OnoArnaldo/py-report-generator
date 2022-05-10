@@ -1,12 +1,12 @@
-from os.path import abspath, dirname, join
+from pathlib import Path
 from reportgen.utils import pug_to_xml as pug, xml_to_dict as xml
 
-ROOT = abspath(dirname(__file__))
-DATA = join(ROOT, 'data')
+ROOT = Path(__file__).parent
+DATA = ROOT.joinpath('data')
 
 
 def test_data():
-    data_xml = xml.from_file(join(DATA, 'report_with_namespace.xml'), 'abdera')
+    data_xml = xml.from_file(DATA.joinpath('report_with_namespace.xml'), 'abdera')
     data = pug.build_data(data_xml)
     ns = {"nfe": "http://www.portalfiscal.inf.br/nfe", "nfe2": "http://www.portalfiscal.inf.br/nfe2"}
 

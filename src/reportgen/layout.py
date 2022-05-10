@@ -1,10 +1,11 @@
-import os
+import typing as _
+from pathlib import Path
 from .utils import pug_to_xml as pug, xml_to_dict as xml
 from . import report as r
 
 
 class Parser:
-    def __init__(self, template_dir, data_dir, asset_dir):
+    def __init__(self, template_dir: Path, data_dir: Path, asset_dir: Path):
         self.template_dir = template_dir
         self.data_dir = data_dir
         self.asset_dir = asset_dir
@@ -12,8 +13,8 @@ class Parser:
         env = pug.build_environment(template_dir=self.template_dir, asset_dir=self.asset_dir)
         self.render = pug.build_renderer(env)
 
-    def __call__(self, template, data, **renderer_args):
-        data = xml.from_file(os.path.join(self.data_dir, data), 'abdera')
+    def __call__(self, template: str, data: str, **renderer_args) -> r.Report:
+        data = xml.from_file(Path(self.data_dir, data), 'abdera')
         data = pug.build_data(data)
 
         report_xml = self.render(template, data=data, **renderer_args)
@@ -32,7 +33,7 @@ class Parser:
 
             return e
 
-    def process(self, data, parent):
+    def process(self, data: list, parent: r.TBase) -> _.NoReturn:
         if isinstance(data, list):
             for el in data:
                 k, v = el.popitem()
@@ -95,4 +96,3 @@ class Parser:
                                        align=att.get('align', ''),
                                        code_set=att.get('code-set', ''),
                                        value=v)
-

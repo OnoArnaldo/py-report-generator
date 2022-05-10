@@ -1,13 +1,13 @@
-import os
+from pathlib import Path
 from reportgen.report import Report
 from ..utils import Ignore
 
-ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
-ASSETS_DIR = os.path.join(ROOT_DIR, 'assets')
+ROOT_DIR = Path(__file__).parent
+ASSETS_DIR = ROOT_DIR.joinpath('assets')
 
 
 def assets(image):
-    return os.path.join(ASSETS_DIR, image)
+    return ASSETS_DIR.joinpath(image)
 
 
 def test_report(canvas):
