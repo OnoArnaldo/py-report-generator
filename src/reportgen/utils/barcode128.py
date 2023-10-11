@@ -16,6 +16,7 @@ class Barcode(Base):
     stop: str
 
 
+# pylint: disable=too-many-instance-attributes
 @dataclass
 class Value(Base):
     value: str
@@ -40,7 +41,7 @@ final_bar = '2'
 @cache
 def get_codes(fname: Path | str, column: str = '128C') -> dict:
     res = {}
-    with open(fname) as f:
+    with open(fname, encoding='utf8') as f:
         reader = csv.reader(f)
         for row in reader:
             value = Value(*row)
@@ -67,7 +68,7 @@ def barcode(value: str, key: str = '128C') -> list[int]:
 
     pos = 1
     for i in range(0, len(value), 2):
-        v = value[i:i + 2]
+        v = value[i : i + 2]
 
         code = codes[v]
         ret += code.width

@@ -1,0 +1,75 @@
+[project]
+name = "reportgen"
+version = "2023.10.11.0001"
+description = "Generate pdf report from xml, and using pugjs-based template"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+keywords = ["pdf generator", "development"]
+authors = [{name = "Arnaldo Ono", email = "git@onoarnaldo.com" }]
+maintainers = [{name = "Arnaldo Ono", email = "git@onoarnaldo.com" }]
+
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Build Tools",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+]
+
+dependencies = ["reportlab", "xmljson", "Jinja2", "pypugjs"]
+
+[project.optional-dependencies]
+test = ["pytest", "coverage"]
+
+[project.urls]
+"Homepage" = "https://github.com/OnoArnaldo/py-html-to-json"
+"Source" = "https://github.com/OnoArnaldo/py-html-to-json"
+
+#[project.scripts]
+#sample = "sample:main"
+
+[tool.setuptools.package-data]
+"reportgen.utils.data" = ["*.csv"]
+
+[tool.pylint.MAIN]
+init-hook = "import sys; sys.path.append('./venv/lib/python3.10/site-packages/'); sys.path.append('./src')"
+
+[tool.pylint.BASIC]
+good-names=["i",
+           "j",
+           "k",
+           "ex",
+           "Run",
+           "_", "A", "B", "C"]
+
+[tool.pylint.VARIABLES]
+allowed-redefined-builtins=["repr"]
+
+[tool.pylint.'MESSAGES CONTROL']
+disable = ["raw-checker-failed",
+    "bad-inline-option",
+    "locally-disabled",
+    "file-ignored",
+    "suppressed-message",
+    "useless-suppression",
+    "deprecated-pragma",
+    "use-symbolic-message-instead",
+    "use-implicit-booleaness-not-comparison-to-string",
+    "use-implicit-booleaness-not-comparison-to-zero",
+    "missing-module-docstring",
+    "missing-function-docstring",
+    "missing-class-docstring",
+    "too-few-public-methods"]
+
+[tool.pylint.FORMAT]
+max-line-length=121
+
+[tool.black]
+line-length = 121
+target-version = ['py310', 'py311']
+skip-string-normalization = true
+
+[tool.mypy]
+implicit_optional = true

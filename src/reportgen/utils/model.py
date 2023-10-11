@@ -36,18 +36,14 @@ def _exec(cls: _.Type, code: str) -> _.NoReturn:
 
 def _build_init(cls: _.Type, frozen: bool = False) -> _.NoReturn:
     code = 'def __init__(self, {args}):\n{setters}'
-    args = ', '.join([f'{v.name}={v.defaulter}'
-                      for v in cls._fields.values()
-                      if v.init])
+    args = ', '.join([f'{v.name}={v.defaulter}' for v in cls._fields.values() if v.init])
 
     if frozen:
-        setters = '\n'.join([f'    object.__setattr__(self, {v.name!r}, {v.name})'
-                             for v in cls._fields.values()
-                             if v.init])
+        setters = '\n'.join(
+            [f'    object.__setattr__(self, {v.name!r}, {v.name})' for v in cls._fields.values() if v.init]
+        )
     else:
-        setters = '\n'.join([f'    self.{v.name} = {v.setter}'
-                             for v in cls._fields.values()
-                             if v.init])
+        setters = '\n'.join([f'    self.{v.name} = {v.setter}' for v in cls._fields.values() if v.init])
 
     no_init = '\n'.join([f'    self.{v.name} = {v.initiator}' for v in cls._fields.values() if not v.init])
     no_init = f'\n{no_init}' if no_init != '' else ''
@@ -60,9 +56,7 @@ def _build_init(cls: _.Type, frozen: bool = False) -> _.NoReturn:
 def _build_repr(cls: _.Type) -> _.NoReturn:
     code = 'def __repr__(self):\n    return f"{clsname}({reprs})"'
     clsname = cls.__name__
-    reprs = ', '.join([f'{v.name}: {{self.{v.name}!r}}'
-                       for v in cls._fields.values()
-                       if v.repr])
+    reprs = ', '.join([f'{v.name}: {{self.{v.name}!r}}' for v in cls._fields.values() if v.repr])
 
     _exec(cls, code.format(clsname=clsname, reprs=reprs))
 
@@ -71,12 +65,10 @@ def _build_readonly(cls: _.Type, frozen: bool = False) -> _.NoReturn:
     if not frozen:
         return
 
-    code = ('def __setattr__(self, key, value):\n'
-            '    raise AttributeError(f"Cannot assign to field \'{key}\'")')
+    code = 'def __setattr__(self, key, value):\n' '    raise AttributeError(f"Cannot assign to field \'{key}\'")'
     _exec(cls, code)
 
-    code = ('def __delattr__(self, key):\n'
-            '    raise AttributeError(f"Cannot delete the field \'{key}\'")')
+    code = 'def __delattr__(self, key):\n' '    raise AttributeError(f"Cannot delete the field \'{key}\'")'
     _exec(cls, code)
 
 
@@ -84,6 +76,7 @@ def model(cls: _.Type = None, /, *, frozen: bool = False) -> _.Callable:
     """
     Class decorator to build __init__ and __repr__ methods based on the fields.
     """
+
     def _model(cls: _.Type):
         _init_fields(cls)
         _build_init(cls, frozen)
@@ -101,6 +94,7 @@ class field:
     Descriptor to define the field behaviour.
     This is heavily based on dataclasses module, and oversimplified to fit my usage.
     """
+
     __slots__ = (
         'init',
         'repr',
@@ -113,13 +107,15 @@ class field:
         'field_type',
     )
 
-    def __init__(self,
-                 default: _.Any = MISSING,
-                 default_factory: _.Callable = MISSING,
-                 set_factory: _.Callable = MISSING,
-                 init: bool = True,
-                 repr: bool = True):
-
+    def __init__(
+        self,
+        default: _.Any = MISSING,
+        default_factory: _.Callable = MISSING,
+        set_factory: _.Callable = MISSING,
+        init: bool = True,
+        repr: bool = True,
+    ):
+        self.name = ''
         self.init = init
         self.repr = repr
         self.default = default

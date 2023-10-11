@@ -1,11 +1,11 @@
 import typing as _
 from dataclasses import fields
 
-TBase = _.TypeVar('TBase', bound='Base')
+BaseT = _.TypeVar('BaseT', bound='Base')
 
 
 class Base:
-    def __getitem__(self: TBase, item: int | str) -> _.Any:
+    def __getitem__(self: BaseT, item: int | str) -> _.Any:
         match item:
             case int(idx):
                 f = fields(self)[idx]
@@ -13,9 +13,9 @@ class Base:
             case str(key):
                 return getattr(self, key)
 
-    def keys(self: TBase) -> list:
+    def keys(self: BaseT) -> list:
         return [f.name for f in fields(self)]
 
-    def replace(self: TBase, **kwargs) -> TBase:
+    def replace(self: BaseT, **kwargs) -> BaseT:
         new_kwargs = {**self, **kwargs}
         return self.__class__(**new_kwargs)

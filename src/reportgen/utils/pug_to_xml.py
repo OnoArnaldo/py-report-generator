@@ -32,7 +32,7 @@ class Data:
 
             children = data.get('children', [])
             return Data([c[item] for c in children if item in c])
-        elif isinstance(data, list) and len(data) == 1:
+        if isinstance(data, list) and len(data) == 1:
             data = data[0]
             if item in data:
                 return Data(data[item])
@@ -41,33 +41,47 @@ class Data:
             return Data([c[item] for c in children if item in c])
         return Data('')
 
-    def __getitem__(self, item: str) -> str | list['Data']:
-        data = self.data
+    def __getitem__(self, item: str) -> str | list['Data'] | None:
         if item == '$':
-            if isinstance(data, str):
-                return data
-            elif isinstance(data, dict):
-                return '\n'.join(data.get('children', []))
-            elif isinstance(data, list):
-                if len(data) == 1 and isinstance(data[0], dict):
-                    return '\n'.join(data[0].get('children', []))
-                return '\n'.join(data)
-        elif item.startswith('@'):
-            att_name = item[1:]
-            if isinstance(data, list):
-                if len(data) == 1 and isinstance(data[0], dict):
-                    return data[0].get('attributes', {}).get(att_name, '')
-                return ''
-            elif isinstance(data, str):
-                return ''
-            return data.get('attributes', {}).get(att_name, '')
-        elif item == '*':
-            return [Data(d) for d in data] if isinstance(data, list) else []
+            return self.get_value()
+        if item.startswith('@'):
+            return self.get_attribute(item)
+        if item == '*':
+            return self.get_items()
+
+        return None
+
+    def get_value(self) -> str:
+        data = self.data
+        if isinstance(data, str):
+            return data
+        if isinstance(data, dict):
+            return '\n'.join(data.get('children', []))
+        if isinstance(data, list):
+            if len(data) == 1 and isinstance(data[0], dict):
+                return '\n'.join(data[0].get('children', []))
+            return '\n'.join(data)
+        return ''
+
+    def get_attribute(self, item: str) -> str:
+        data = self.data
+        att_name = item[1:]
+        if isinstance(data, list):
+            if len(data) == 1 and isinstance(data[0], dict):
+                return data[0].get('attributes', {}).get(att_name, '')
+            return ''
+        if isinstance(data, str):
+            return ''
+        return data.get('attributes', {}).get(att_name, '')
+
+    def get_items(self) -> list:
+        data = self.data
+        return [Data(d) for d in data] if isinstance(data, list) else []
 
 
 class DataWithNS(Data):
     def __init__(self, data: dict | list | str, ns: _.Dict):
-        super(DataWithNS, self).__init__(data)
+        super().__init__(data)
         self.ns = ns
 
     def __getattr__(self, item: str) -> 'Data':
@@ -76,11 +90,11 @@ class DataWithNS(Data):
             ns, name = item.split('__')
             name = '{' + self.ns.get(ns, '') + '}' + name
 
-        ret = super(DataWithNS, self).__getattr__(name)
+        ret = super().__getattr__(name)
         return DataWithNS(ret.data, self.ns)
 
     def __getitem__(self, item: str) -> str | list['Data']:
-        ret = super(DataWithNS, self).__getitem__(item)
+        ret = super().__getitem__(item)
         if isinstance(ret, list):
             return [DataWithNS(i.data, self.ns) for i in ret]
         return ret
@@ -100,12 +114,9 @@ def build_environment(*, template_dir: Path, asset_dir: Path) -> Environment:
 
 def build_renderer(jinja_env: Environment) -> _.Callable:
     def render(template, **kwargs):
-        return jinja_env\
-            .get_template(f'{template}.pug')\
-            .render(enumerate=enumerate,
-                    asset=_get_asset,
-                    dataNS=_data_with_namespace,
-                    **kwargs)
+        return jinja_env.get_template(f'{template}.pug').render(
+            enumerate=enumerate, asset=_get_asset, dataNS=_data_with_namespace, **kwargs
+        )
 
     return render
 

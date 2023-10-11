@@ -13,7 +13,7 @@ engines = {
 
 class InvalidEngine(Exception):
     def __init__(self, engine):
-        super(InvalidEngine, self).__init__(f'Invalid engine {engine}')
+        super().__init__(f'Invalid engine {engine}')
 
 
 def from_string(text: str, engine: str = 'abdera') -> _.OrderedDict:

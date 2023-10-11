@@ -7,6 +7,8 @@ class FakeCanvas:
 
     def __init__(self, reference):
         self.reference = reference
+        self._fontname: str
+        self._fontsize: float
 
     def __getitem__(self, item):
         ref = object.__getattribute__(self, 'reference')

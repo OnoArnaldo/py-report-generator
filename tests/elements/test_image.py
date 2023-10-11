@@ -1,3 +1,4 @@
+# pylint: disable=unused-variable
 import os
 from reportlab.lib import pagesizes
 from reportlab.lib.units import cm
@@ -13,20 +14,12 @@ def assets(image):
 
 
 def test_image(canvas):
-    img = Image(canvas) \
-        .parent_size(*pagesizes.A4) \
-        .parent_position(0, 0) \
-        .margin(cm) \
-        .filename(assets('150.png')) \
-        .draw()
+    img = Image(canvas).parent_size(*pagesizes.A4).parent_position(0, 0).margin(cm).filename(assets('150.png')).draw()
 
     assert object.__getattribute__(canvas, 'log') == [
-        ['canvas/drawImage(..)',
-         (Ignore,
-          28.346456692913385,
-          28.346456692913385,
-          538.5826771653544,
-          785.196850393701),
-         {'preserveAspectRatio': True}
-         ]
+        [
+            'canvas/drawImage(..)',
+            (Ignore, 28.346456692913385, 28.346456692913385, 538.5826771653544, 785.196850393701),
+            {'preserveAspectRatio': True},
+        ]
     ]

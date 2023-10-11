@@ -5,7 +5,7 @@ from reportlab.lib import pagesizes, units
 from .utils.model import model, field
 from . import elements as e
 
-TBase = _.TypeVar('TBase')
+BaseT = _.TypeVar('BaseT')
 
 
 @model
@@ -33,14 +33,15 @@ class Base:
         return units.cm
 
     @cached_property
-    def calculated_font(self) -> tuple:
+    def calculated_font(self) -> tuple | None:
         if self.font != '':
             family, size, align = self.font.split()
             return family, int(size), getattr(e.FontAlign, align.upper(), e.FontAlign.LEFT)
-        elif self.parent:
+        if self.parent:
             return self.parent.calculated_font
+        return None
 
-    def new_child(self, cls: _.Type[TBase], *args, **kwargs) -> TBase:
+    def new_child(self, cls: _.Type[BaseT], *args, **kwargs) -> BaseT:
         child = cls(*args, **kwargs)
 
         child.parent = self
@@ -57,16 +58,16 @@ class BaseWithMargin(Base):
     def calculated_margin(self) -> list:
         unit = self.calculated_unit
         if isinstance(self.margin, (int, float)):
-            margin = [self.margin*unit]
+            margin = [self.margin * unit]
         else:
-            margin = list(map(lambda x: float(x)*unit, self.margin.split()))
+            margin = list(map(lambda x: float(x) * unit, self.margin.split()))
         if len(margin) == 0:
             return [0.0, 0.0, 0.0, 0.0]
-        elif len(margin) == 1:
+        if len(margin) == 1:
             return margin * 4
-        elif len(margin) == 2:
+        if len(margin) == 2:
             return margin * 2
-        elif len(margin) == 3:
+        if len(margin) == 3:
             return margin + [0.0]
         return margin
 
@@ -107,12 +108,14 @@ class Report(Base):
 @model
 class Page(BaseWithMargin, Box):
     def process(self, canvas: Canvas) -> _.NoReturn:
-        page = e.Row(canvas)\
-            .parent_size(*self.calculated_page_size)\
-            .parent_position(0, 0)\
-            .margin(*self.calculated_margin)\
-            .stroke(0)\
+        page = (
+            e.Row(canvas)
+            .parent_size(*self.calculated_page_size)
+            .parent_position(0, 0)
+            .margin(*self.calculated_margin)
+            .stroke(0)
             .draw()
+        )
 
         for idx, child in enumerate(self.children):
             sibling = child.process(page.build_child if idx == 0 else sibling.build_sibling)
@@ -134,11 +137,13 @@ class Row(BaseWithMargin, Box):
         return int(self.border or 0)
 
     def process(self, builder: _.Callable) -> 'Row':
-        row: e.Row = builder(e.Row)\
-            .margin(*self.calculated_margin)\
-            .height(self.calculated_height)\
-            .stroke(self.calculated_border)\
+        row: e.Row = (
+            builder(e.Row)
+            .margin(*self.calculated_margin)
+            .height(self.calculated_height)
+            .stroke(self.calculated_border)
             .draw()
+        )
 
         for idx, child in enumerate(self.children):
             sibling = child.process(row.build_child if idx == 0 else sibling.build_sibling)
@@ -160,11 +165,13 @@ class Column(BaseWithMargin, Box):
         return int(self.border or 0)
 
     def process(self, builder: _.Callable) -> 'Column':
-        column = builder(e.Column)\
-            .margin(*self.calculated_margin)\
-            .width(self.calculated_width)\
-            .stroke(self.calculated_border)\
+        column = (
+            builder(e.Column)
+            .margin(*self.calculated_margin)
+            .width(self.calculated_width)
+            .stroke(self.calculated_border)
             .draw()
+        )
 
         for idx, child in enumerate(self.children):
             sibling = child.process(column.build_child if idx == 0 else sibling.build_sibling)
@@ -177,11 +184,7 @@ class Text(BaseWithMargin):
     value = field(default='')
 
     def process(self, builder: _.Callable) -> 'Text':
-        return builder(e.Text)\
-            .margin(*self.calculated_margin)\
-            .font(*self.calculated_font)\
-            .value(self.value)\
-            .draw()
+        return builder(e.Text).margin(*self.calculated_margin).font(*self.calculated_font).value(self.value).draw()
 
 
 @model
@@ -189,9 +192,7 @@ class Image(BaseWithMargin):
     value = field(default='')
 
     def process(self, builder: _.Callable) -> 'Image':
-        return builder(e.Image)\
-            .filename(self.value)\
-            .draw()
+        return builder(e.Image).filename(self.value).draw()
 
 
 @model
@@ -208,11 +209,13 @@ class Line(BaseWithMargin):
         return [int(v) for v in self.dashes.split()]
 
     def process(self, builder: _.Callable) -> 'Line':
-        return builder(e.Line)\
-            .margin(*self.calculated_margin)\
-            .stroke(self.calculated_stroke)\
-            .dashes(*self.calculated_dashes)\
+        return (
+            builder(e.Line)
+            .margin(*self.calculated_margin)
+            .stroke(self.calculated_stroke)
+            .dashes(*self.calculated_dashes)
             .draw()
+        )
 
 
 @model
@@ -236,17 +239,20 @@ class Barcode(BaseWithMargin):
     def calculated_align(self) -> e.FontAlign:
         if self.align.upper() == 'LEFT':
             return e.FontAlign.LEFT
-        elif self.align.upper() == 'CENTER':
+        if self.align.upper() == 'CENTER':
             return e.FontAlign.CENTER
-        elif self.align.upper() == 'RIGHT':
+        if self.align.upper() == 'RIGHT':
             return e.FontAlign().RIGHT
+        return None
 
     def process(self, builder: _.Callable) -> 'Barcode':
-        return builder(e.Barcode) \
-            .align(self.calculated_align) \
-            .height(self.calculated_height) \
-            .bar_width(self.calculated_bar_width) \
-            .margin(*self.calculated_margin) \
-            .code_set(self.code_set) \
-            .value(self.value) \
+        return (
+            builder(e.Barcode)
+            .align(self.calculated_align)
+            .height(self.calculated_height)
+            .bar_width(self.calculated_bar_width)
+            .margin(*self.calculated_margin)
+            .code_set(self.code_set)
+            .value(self.value)
             .draw()
+        )
